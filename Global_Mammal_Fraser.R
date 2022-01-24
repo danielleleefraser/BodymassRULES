@@ -82,6 +82,7 @@ coord_func<-cbind(coords_filt,Rich)
 
 colnames(coord_func)<-c("x","y","Rich")
 coord_func<-data.frame(coord_func)
+plot(coord_func$Rich~coord_func$y,xlab="Latitude",ylab="Species Richness")
 
 e<-extent(coord_func[,1:2]) # make e the actual grid, grid polygon filt
 wgs1984.proj <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
@@ -90,6 +91,38 @@ r_new<-rasterize(coord_func[,1:2],r,coord_func[,3])
 colors<-rainbow(nrow(r))
 plot(r_new,col=colors)
 plot(world,add=T)
+
+
+# Plot richness of missing taxa on the map
+
+missing<-read.csv("Taxa missing from all databases.csv",row.names=1)
+PA_table<-read.csv("Global occurrence matrix December 2021.csv",header=T)
+PA_table_new<-PA_table[,missing$x]
+
+coords_filt<-read.csv("PAtable coordinates.csv",header=T,row.names=1)
+Rich<-rowSums(PA_table_new)
+
+coord_func<-cbind(coords_filt,Rich)
+
+colnames(coord_func)<-c("x","y","Rich")
+coord_func<-data.frame(coord_func)
+plot(coord_func$Rich~coord_func$y,xlab="Latitude",ylab="Species Richness")
+
+e<-extent(coord_func[,1:2]) # make e the actual grid, grid polygon filt
+wgs1984.proj <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+r<-raster(e,nrow=200,ncol=200,crs=wgs1984.proj)
+r_new<-rasterize(coord_func[,1:2],r,coord_func[,3])
+colors<-rainbow(nrow(r))
+plot(r_new,col=colors)
+plot(world,add=T)
+
+
+
+
+
+
+
+
 
 
 
